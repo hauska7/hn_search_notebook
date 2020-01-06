@@ -1,1 +1,74 @@
-Hello
+<section class="text-center">                                                                                                             
+  <div class="container">
+    <div class="row">
+      <form action="<%= search_hackernews_path %>", method="get" >
+        <div class="form-row align-items-center">
+          <div class="col-auto">
+            <input type="text" name="query" class="form-control" placeholder="Search..." value="<%= @query_string %>">
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Search</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="row">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Search result</th>
+            <th scope="col">Url</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @search_results.each_with_index do |search_result, i| %>
+            <tr>
+              <td><%= @pagination.offset + i + 1 %></td>
+              <td><%= search_result.present %></td>
+              <td>
+                <% if search_result.url %>
+                  <%= link_to "Visit", search_result.url %>
+                <% end %>
+               </td>
+              <td>
+                <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Add to notebook
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <% @search_notebooks.each do |notebook| %>
+                      <a class="dropdown-item add-search-result-to-search-notebook" data-search-notebook-id="<%= notebook.id %>" data-search-result-id="<%= search_result.id %>"><%= notebook.present %></a>
+                    <% end %>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <% if @pagination.has_many_pages? %>
+        <nav>
+          <ul class="pagination">
+            <% if @pagination.has_previous_page? %>
+              <li class="page-item">
+                <a class="page-link" href="<%= @pagination.query_with_previous_page(@base_query_string) %>">
+                  Previous
+                </a>
+              </li>
+            <% end %>
+            <% if @pagination.has_next_page? %>
+              <li class="page-item">
+                <a class="page-link" href="<%= @pagination.query_with_next_page(@base_query_string) %>">
+                  Next
+                </a>
+              </li>
+            <% end %>
+          </ul>
+        </nav>
+    <% end %>
+    </div>
+  </div>
+</section>
+

@@ -1,7 +1,42 @@
-<h2><%= @search_notebook.present %></h2>
-
-<ul class="list-group">
-  <% @search_results.each do |result| %>
-    <li class="list-group-item"><%= result.present %></li>
-  <% end %>
-</ul>
+<section class="text-center">                                                                                                             
+  <div class="container">
+    <div>
+      <h2><%= @search_notebook.present %></h2>
+      
+    </div>
+    <div class="row">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Search result</th>
+            <th scope="col">Url</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @search_results.each_with_index do |search_result, i| %>
+            <tr>
+              <td><%= i + 1 %></td>
+              <td><%= search_result.present %></td>
+              <td>
+                <% if search_result.url %>
+                  <%= link_to "Visit", search_result.url %>
+                <% end %>
+              </td>
+              <td>
+                <%= link_to "Remove",
+                            remove_search_result_from_search_notebook_path(
+                              search_notebook_id: @search_notebook.id,
+                              search_result_id: search_result.id
+                            ),
+                            method: "post",
+                            class: "btn btn-danger" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

@@ -6,7 +6,7 @@ describe MainController, type: :controller do
   context "create_search_notebook" do
     it "success" do
       expect do
-        post :create_search_notebook, params: { title: "Superheroes" }
+        post :create_search_notebook, params: { search_notebook: { title: "Superheroes" } }
       end.to change { SearchNotebook.count }.by 1
 
       search_notebook = SearchNotebook.last
@@ -49,6 +49,7 @@ describe MainController, type: :controller do
 
       batman = SearchResult.new
       batman.hn_login = "shaklee3"
+      batman.hn_object_id = "1"
       batman.url = "http://batman.com"
       batman.author_karma_points = 1727
       batman.tags = ["batman"]
@@ -56,6 +57,7 @@ describe MainController, type: :controller do
       batman.save!
       wonder_woman = SearchResult.new
       wonder_woman.hn_login = "eat_veggies"
+      wonder_woman.hn_object_id = "2"
       wonder_woman.url = "http://wonderwoman.com"
       wonder_woman.author_karma_points = 1140
       wonder_woman.tags = ["wonder_woman"]
@@ -92,6 +94,7 @@ describe MainController, type: :controller do
 
       batman = SearchResult.new
       batman.hn_login = "shaklee3"
+      batman.hn_object_id = "3"
       batman.url = "http://batman.com"
       batman.author_karma_points = 1727
       batman.tags = ["batman"]
@@ -106,11 +109,17 @@ describe MainController, type: :controller do
              params: { search_notebook_id: superheroes.id, search_result_id: batman.id }
 
       expect(superheroes.reload.search_results.include?(batman)).to be false
+
+      # removing search result that is not in search notebook
+      post :remove_search_result_from_search_notebook,
+             params: { search_notebook_id: superheroes.id, search_result_id: batman.id }
+      
+      expect(response).to have_http_status(302)
     end
   end
 
   context "HN search" do
-    it "search HN" do
+    it "basic search" do
       VCR.use_cassette("hn_search") do
         get :search_hackernews, params: { query: "wonder woman superman" }
       end
@@ -128,18 +137,38 @@ describe MainController, type: :controller do
       expect(search_result.tags).to match_array ["story"]
     end
 
-    it "pagination" do
-      # each paginated query are considered separate now. It should be concidered to have different paginations use the same query
-      VCR.use_cassette("hn_search_paginated") do
-        get :search_hackernews, params: { query: "superheroes", page: 3 }
-      end
+    it "cant search empty query" do
+      get :search_hackernews
 
-      expect(response).to have_http_status(200)
-      search_query = SearchQuery.last
-      expect(search_query.query).to eq "superheroes"
-      expect(search_query.total_hits_count).to eq 144
-      expect(search_query.search_results.count).to eq 10
-      expect(search_query.search_results.map(&:hn_login).include?("janober")).to be true
+      expect(response).to have_http_status(302)
+    end
+
+    context "pagination" do
+      it "basic flow" do
+        VCR.use_cassette("hn_search_paginated") do
+          get :search_hackernews, params: { query: "superheroes", page: 3 }
+
+          expect(response).to have_http_status(200)
+          search_query = SearchQuery.last
+          expect(search_query.query).to eq "superheroes"
+          expect(search_query.total_hits_count).to eq 133
+          expect(search_query.search_results.count).to eq 10
+          expect(search_query.search_results.map(&:hn_login).include?("dy")).to be true
+
+          # pagination uses the same search query
+          expect(SearchQuery.count).to eq 1
+
+          get :search_hackernews, params: { query: "superheroes", search_query_id: search_query.id, page: 4 }
+
+          expect(SearchQuery.count).to eq 1
+          expect(search_query.reload.search_results.count).to eq 20
+
+          # reuse search results from pagination
+          get :search_hackernews, params: { query: "superheroes", search_query_id: search_query.id, page: 4 }
+
+          expect(search_query.reload.search_results.count).to eq 20
+        end
+      end
     end
   end
 
@@ -167,6 +196,7 @@ describe MainController, type: :controller do
 
       batman = SearchResult.new
       batman.hn_login = "shaklee3"
+      batman.hn_object_id = "4"
       batman.url = "http://batman.com"
       batman.author_karma_points = 1727
       batman.tags = ["batman"]
@@ -174,6 +204,7 @@ describe MainController, type: :controller do
       batman.save!
       wonder_woman = SearchResult.new
       wonder_woman.hn_login = "eat_veggies"
+      wonder_woman.hn_object_id = "5"
       wonder_woman.url = "http://wonderwoman.com"
       wonder_woman.author_karma_points = 1140
       wonder_woman.tags = ["wonder_woman"]
@@ -202,17 +233,28 @@ describe MainController, type: :controller do
 
       batman = SearchResult.new
       batman.hn_login = "shaklee3"
+      batman.hn_object_id = "6"
       batman.url = "http://batman.com"
       batman.author_karma_points = 1727
       batman.tags = ["batman"]
       batman.search_query = dc_superheroes_query
       batman.save!
 
-      post :add_search_result_to_search_notebook,
-           params: { search_notebook_id: superheroes.id, search_result_id: batman.id }
+      expect(superheroes.search_results.count).to eq 0
 
+      post :add_search_result_to_search_notebook,
+           params: { mode: "ajax", search_notebook_id: superheroes.id, search_result_id: batman.id }
+
+      expect(superheroes.search_results.count).to eq 1
       search_result = superheroes.search_results.first
       expect(search_result).to eq batman
+
+      # adding again same search result
+      post :add_search_result_to_search_notebook,
+           params: { mode: "ajax", search_notebook_id: superheroes.id, search_result_id: batman.id }
+
+      # todo: consider disallowing adding same search result twice
+      expect(superheroes.search_results.count).to eq 2
     end
   end
 

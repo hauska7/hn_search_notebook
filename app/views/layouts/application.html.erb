@@ -5,11 +5,32 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag    'application', media: 'all' %>
+    <%= javascript_include_tag 'application' %>
   </head>
 
   <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <a class="navbar-brand" href="<%= root_path %>"><%= HnSearchNotebook.app_name %></a>
+      <a class="navbar-brand" href="<%= show_statistics_path %>">Statistics</a>
+    </nav>
+
+
+    <section class="text-center">                                                                                                             
+      <div class="container">
+        <% if notice %>
+          <div class="alert alert-primary" role="alert">
+            <%= notice %>
+          </div>
+        <% end %>
+        <% if alert %>
+          <div class="alert alert-warning" role="alert">
+            <%= alert %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
     <%= yield %>
   </body>
 </html>

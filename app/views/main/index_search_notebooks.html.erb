@@ -1,5 +1,56 @@
-<ul class="list-group">
-  <% @search_notebooks.each do |notebook| %>
-    <li class="list-group-item"><%= notebook.present %></li>
-  <% end %>
-</ul>
+<section class="text-center">                                                                                                             
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <form action="<%= search_hackernews_path %>", method="get" >
+          <div class="form-row align-items-center">
+            <div class="col-auto">
+              <input type="text" name="query" class="form-control" placeholder="Search...">
+            </div>
+            <div class="col-auto">
+              <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="col-sm">
+        <%= form_for @search_notebook, url: create_search_notebook_path, html: { class: "" } do |f| %>
+          <div class="form-row align-items-center">
+            <div class="col-auto">
+              <%= f.text_field :title, class: "form-control", placeholder: "Title" %>
+            </div>
+            <div class="col-auto">
+              <%= f.submit "Create Notebook", class: "btn btn-primary" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    <div class="row">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Search notebook</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @search_notebooks.each_with_index do |notebook, i| %>
+            <tr>
+              <td><%= i + 1 %></td>
+              <td><%= link_to notebook.present, show_search_notebook_path(notebook) %></td>
+              <td>
+                <%= link_to "Delete",
+                            destroy_search_notebook_path(notebook),
+                            method: "post",
+                            class: "btn btn-danger" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
