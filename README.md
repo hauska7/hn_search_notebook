@@ -1,6 +1,8 @@
 # README
 
-AHN Search Notebook application.
+HN Search Notebook application.
+
+https://hnsearchnotebook.herokuapp.com
 
 * How to run the test suite
 
