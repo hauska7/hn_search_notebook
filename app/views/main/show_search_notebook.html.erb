@@ -1,0 +1,7 @@
+<h2><%= @search_notebook.present %></h2>
+
+<ul class="list-group">
+  <% @search_results.each do |result| %>
+    <li class="list-group-item"><%= result.present %></li>
+  <% end %>
+</ul>

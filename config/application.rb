@@ -16,4 +16,12 @@ module HnSearchNotebook
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
   end
+
+  def self.app_name
+    "Hn Search Notebook"
+  end
+
+  def self.app_domain
+    "hnsearchnotebook.herokuapp.com"
+  end
 end

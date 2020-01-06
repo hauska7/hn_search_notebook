@@ -1,0 +1,20 @@
+<h2>Query Statistics</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Query</th>
+      <th scope="col">Last day total hits average</th>
+      <th scope="col">Last week total hits average</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @items.each do |item| %>
+      <tr>
+        <td><%= item[:query_string] %></td>
+        <td><%= item[:last_day_total_hits_average] %></td>
+        <td><%= item[:last_week_total_hits_average] %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

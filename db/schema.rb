@@ -10,10 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_05_091707) do
+ActiveRecord::Schema.define(version: 2020_01_06_072513) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "results_in_notebooks", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "search_result_id", null: false
+    t.bigint "search_notebook_id", null: false
+    t.index ["search_notebook_id"], name: "index_results_in_notebooks_on_search_notebook_id"
+    t.index ["search_result_id"], name: "index_results_in_notebooks_on_search_result_id"
+  end
 
   create_table "search_notebooks", force: :cascade do |t|
     t.string "title", null: false
@@ -31,7 +40,7 @@ ActiveRecord::Schema.define(version: 2020_01_05_091707) do
   create_table "search_results", force: :cascade do |t|
     t.string "hn_login", null: false
     t.string "url", null: false
-    t.integer "author_karma_points", null: false
+    t.integer "author_karma_points"
     t.string "tags", null: false, array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -39,5 +48,7 @@ ActiveRecord::Schema.define(version: 2020_01_05_091707) do
     t.index ["search_query_id"], name: "index_search_results_on_search_query_id"
   end
 
+  add_foreign_key "results_in_notebooks", "search_notebooks"
+  add_foreign_key "results_in_notebooks", "search_results"
   add_foreign_key "search_results", "search_queries"
 end

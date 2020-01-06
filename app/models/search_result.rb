@@ -1,6 +1,10 @@
 class SearchResult < ApplicationRecord
-  validate :hn_login, presence: true
-  validate :url, presence: true
-  validate :author_karma_points, presence: true
+  validates :hn_login, presence: true
+  validates :url, presence: true
 
+  belongs_to :search_query
+
+  def present
+    "#{hn_login} #{url}"
+  end
 end

@@ -4,17 +4,23 @@ describe MainController, type: :controller do
   render_views
 
   context "create_search_notebook" do
-    it "create empty search_notebook" do
+    it "success" do
       expect do
         post :create_search_notebook, params: { title: "Superheroes" }
-      end.to_change { SearchNotebook.count }.by 1
+      end.to change { SearchNotebook.count }.by 1
 
       search_notebook = SearchNotebook.last
       expect(search_notebook.title).to eq "Superheroes"
     end
+
+    it "invalid title" do
+      expect do
+        post :create_search_notebook
+      end.to change { SearchNotebook.count }.by 0
+    end
   end
 
-  context "index_search_notebook" do
+  context "index_search_notebooks" do
     it "list search notebooks" do
       superheroes = SearchNotebook.new
       superheroes.title = "Superheroes"
@@ -23,7 +29,7 @@ describe MainController, type: :controller do
       cartoons.title = "Cartoons"
       cartoons.save!
 
-      get :index_search_notebook
+      get :index_search_notebooks
 
       expect(response).to have_http_status(200)
       expect(assigns(:search_notebooks)).to match_array [superheroes, cartoons]
@@ -38,6 +44,7 @@ describe MainController, type: :controller do
 
       dc_superheroes_query = SearchQuery.new
       dc_superheroes_query.query = "dc superheroes"
+      dc_superheroes_query.total_hits_count = 0
       dc_superheroes_query.save!
 
       batman = SearchResult.new
@@ -55,27 +62,32 @@ describe MainController, type: :controller do
       wonder_woman.search_query = dc_superheroes_query
       wonder_woman.save!
 
-      # todo: add another search notebook and have a sharde search result
+      Service.add_result_to_notebook(superheroes, [batman, wonder_woman])
+
+      # todo: add another search notebook and have a shared search result
       expect(SearchNotebook.count).to eq 1
       expect(SearchQuery.count).to eq 1
       expect(SearchResult.count).to eq 2
+      expect(ResultsInNotebook.count).to eq 2
 
-      delete :destroy_search_notebook, params: { id: superheroes.id }
+      post :destroy_search_notebook, params: { id: superheroes.id }
 
       expect(SearchNotebook.count).to eq 0
       expect(SearchQuery.count).to eq 1
-      expect(SearchResult.count).to eq 0
+      expect(SearchResult.count).to eq 2
+      expect(ResultsInNotebook.count).to eq 0
     end
   end
 
   context "remove_search_result_from_search_notebook" do
-    it "" do
+    it "success" do
       superheroes = SearchNotebook.new
       superheroes.title = "Superheroes"
       superheroes.save!
 
       dc_superheroes_query = SearchQuery.new
       dc_superheroes_query.query = "dc superheroes"
+      dc_superheroes_query.total_hits_count = 0
       dc_superheroes_query.save!
 
       batman = SearchResult.new
@@ -86,37 +98,41 @@ describe MainController, type: :controller do
       batman.search_query = dc_superheroes_query
       batman.save!
 
-      # add batman to superheroes
+      Service.add_result_to_notebook(superheroes, batman)
+
+      expect(superheroes.search_results.include?(batman)).to be true
 
       post :remove_search_result_from_search_notebook,
-           params: { search_notebook_id: superheroes.id, search_result_id: batman.id }
+             params: { search_notebook_id: superheroes.id, search_result_id: batman.id }
 
-      # expect batman not to be in superheroes
+      expect(superheroes.reload.search_results.include?(batman)).to be false
     end
   end
 
   context "HN search" do
     it "search HN" do
-      batman = SearchResult.new
-      batman.hn_login = "shaklee3"
-      batman.url = "http://batman.com"
-      batman.author_karma_points = 1727
-      batman.tags = ["batman"]
-      wonder_woman = SearchResult.new
-      wonder_woman.hn_login = "eat_veggies"
-      wonder_woman.url = "http://wonderwoman.com"
-      wonder_woman.author_karma_points = 1140
-      wonder_woman.tags = ["wonder_woman"]
+      #batman = SearchResult.new
+      #batman.hn_login = "shaklee3"
+      #batman.url = "http://batman.com"
+      #batman.author_karma_points = 1727
+      #batman.tags = ["batman"]
+      #wonder_woman = SearchResult.new
+      #wonder_woman.hn_login = "eat_veggies"
+      #wonder_woman.url = "http://wonderwoman.com"
+      #wonder_woman.author_karma_points = 1140
+      #wonder_woman.tags = ["wonder_woman"]
 
-      get :search_hackernews, params: { query: "Superheroes" }
+      #http://hn.algolia.com/api/v1/search?query=foo&tags=story
+
+      get :search_hackernews, params: { query: "wonder woman superman" }
 
       expect(response).to have_http_status(200)
-      expect(assigns(:search_results)).to match_array [batman, wonder_woman]
       search_query = SearchQuery.last
-      expect(search_query.query).to eq "Superheroes"
+      expect(search_query.query).to eq "wonder woman superman"
       expect(search_query.total_hit_count).to eq 2
       search_results = search_query.search_results.to_a
-      expect(search_results).to match_array [batman, wonder_woman]
+      # todo: test search_results content
+      expect(assigns(:search_results)).to match_array search_results
     end
 
     it "pagination" do
@@ -126,7 +142,14 @@ describe MainController, type: :controller do
 
   context "show_search_notebook" do
     it "empty" do
-      pending
+      superheroes = SearchNotebook.new
+      superheroes.title = "Superheroes"
+      superheroes.save!
+
+      get :show_search_notebook, params: { id: superheroes.id }
+
+      expect(response).to have_http_status(200)
+      expect(assigns(:search_results)).to be_empty
     end
 
     it "with content" do
@@ -136,6 +159,7 @@ describe MainController, type: :controller do
 
       dc_superheroes_query = SearchQuery.new
       dc_superheroes_query.query = "dc superheroes"
+      dc_superheroes_query.total_hits_count = 0
       dc_superheroes_query.save!
 
       batman = SearchResult.new
@@ -152,6 +176,8 @@ describe MainController, type: :controller do
       wonder_woman.tags = ["wonder_woman"]
       wonder_woman.search_query = dc_superheroes_query
       wonder_woman.save!
+
+      Service.add_result_to_notebook(superheroes, [batman, wonder_woman])
 
       get :show_search_notebook, params: { id: superheroes.id }
 
@@ -168,6 +194,7 @@ describe MainController, type: :controller do
 
       dc_superheroes_query = SearchQuery.new
       dc_superheroes_query.query = "dc superheroes"
+      dc_superheroes_query.total_hits_count = 0
       dc_superheroes_query.save!
 
       batman = SearchResult.new
@@ -188,46 +215,58 @@ describe MainController, type: :controller do
 
   context "statistics" do
     it "display" do
-      get :statistics
+      dc_superheroes_query_1 = SearchQuery.new
+      dc_superheroes_query_1.query = "dc superheroes"
+      dc_superheroes_query_1.total_hits_count = 3
+      dc_superheroes_query_1.save!
+      dc_superheroes_query_2 = SearchQuery.new
+      dc_superheroes_query_2.query = "dc superheroes"
+      dc_superheroes_query_2.total_hits_count = 13
+      dc_superheroes_query_2.save!
+      dc_superheroes_query_3 = SearchQuery.new
+      dc_superheroes_query_3.query = "dc superheroes"
+      dc_superheroes_query_3.total_hits_count = 100
+      dc_superheroes_query_3.created_at = 2.days.ago
+      dc_superheroes_query_3.save!
+      dc_superheroes_query_4 = SearchQuery.new
+      dc_superheroes_query_4.query = "dc superheroes"
+      dc_superheroes_query_4.total_hits_count = 200
+      dc_superheroes_query_4.created_at = 8.days.ago
+      dc_superheroes_query_4.save!
+      marvel_superheroes_query = SearchQuery.new
+      marvel_superheroes_query.query = "marvel superheroes"
+      marvel_superheroes_query.total_hits_count = 300
+      marvel_superheroes_query.save!
+      cartoons_query = SearchQuery.new
+      cartoons_query.query = "cartoons"
+      cartoons_query.total_hits_count = 400
+      cartoons_query.created_at = 8.days.ago
+      cartoons_query.save!
+
+      get :show_statistics
+
+      items = assigns(:items)
+      query_strings = items.map { |item| item[:query_string] }
+      expect(query_strings).to match_array ["dc superheroes", "marvel superheroes", "cartoons"]
+      dc_superheroes_item = items.find { |item| item[:query_string] == "dc superheroes" }
+      expect(dc_superheroes_item[:last_day_total_hits_average]).to eq 8.0
+      expect(dc_superheroes_item[:last_week_total_hits_average]).to eq 38.66
+      marvel_superheroes_item = items.find { |item| item[:query_string] == "marvel superheroes" }
+      expect(marvel_superheroes_item[:last_day_total_hits_average]).to eq 300.0
+      expect(marvel_superheroes_item[:last_week_total_hits_average]).to eq 300.0
+      cartoons_item = items.find { |item| item[:query_string] == "cartoons" }
+      expect(cartoons_item[:last_day_total_hits_average]).to be_nil
+      expect(cartoons_item[:last_week_total_hits_average]).to be_nil
     end
   end
 end
 
 describe "services" do
-  it "clean search results" do
-    superheroes = SearchNotebook.new
-    superheroes.title = "Superheroes"
-    superheroes.save!
-
-    dc_superheroes_query = SearchQuery.new
-    dc_superheroes_query.query = "dc superheroes"
-    dc_superheroes_query.save!
-
-    batman = SearchResult.new
-    batman.hn_login = "shaklee3"
-    batman.url = "http://batman.com"
-    batman.author_karma_points = 1727
-    batman.tags = ["batman"]
-    batman.search_query = dc_superheroes_query
-    batman.save!
-    wonder_woman = SearchResult.new
-    wonder_woman.hn_login = "eat_veggies"
-    wonder_woman.url = "http://wonderwoman.com"
-    wonder_woman.author_karma_points = 1140
-    wonder_woman.tags = ["wonder_woman"]
-    wonder_woman.search_query = dc_superheroes_query
-    wonder_woman.save!
-
-    # add batman to superheroes
-
-    # run clean up
-
-    # expect batman to saau and wonder woman to go
-    expect(SearchResult.count).to eq 1
-    expect(SearchResult.first!).to be batman
+  it "clean search results old and not saved to notebook" do
+    # todo
   end
 
-  it "clean search queries" do
+  it "clean old search queries" do
     # todo
   end
 end

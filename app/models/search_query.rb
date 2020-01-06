@@ -1,4 +1,4 @@
 class SearchQuery < ApplicationRecord
-  validate :query, presence: true
+  validates :query, presence: true
 
 end
