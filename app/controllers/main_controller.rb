@@ -19,32 +19,34 @@ class MainController < ApplicationController
   def search_hackernews
     query_string = params["query"]
 
-    url_string = "https://hn.algolia.com/api/v1/search?tags=story&" + { query: query_string }.to_query
-    data = URI.parse(url_string).read("User-Agent" => HnSearchNotebook.app_name, "From" => HnSearchNotebook.app_domain)
+    result = ExternalRequests.search_hn(query_string, params["page"])
+    if result.failure?
+      flash[:alert] = "Something went wrong with searching HackerNews."
+      return redirect_to :root
+    end
 
-    data = JSON.parse(data)
+    data = result.data
 
     search_query = SearchQuery.new
     search_query.query = query_string
     search_query.total_hits_count = data["nbHits"]
 
-    search_results = data["hits"].map do |hit|
+    @search_results = data["hits"].map do |hit|
       search_result = SearchResult.new
       search_result.hn_login = hit["author"]
-      search_result.url = hit["url"]
+      search_result.url = hit["url"].presence
       # todo: handle tags from user input
       search_result.tags = ["story"]
       search_result.search_query = search_query
+      search_result
     end
 
     ActiveRecord::Base.transaction do
       search_query.save!
-      search_results.each(&:save!)
+      @search_results.each(&:save!)
     end
 
-    Service.schedule_fetching_author_karma(search_results)
-
-    binding.pry
+    Service.schedule_fetching_author_karma(@search_results)
   end
 
   def create_search_notebook

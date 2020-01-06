@@ -111,32 +111,35 @@ describe MainController, type: :controller do
 
   context "HN search" do
     it "search HN" do
-      #batman = SearchResult.new
-      #batman.hn_login = "shaklee3"
-      #batman.url = "http://batman.com"
-      #batman.author_karma_points = 1727
-      #batman.tags = ["batman"]
-      #wonder_woman = SearchResult.new
-      #wonder_woman.hn_login = "eat_veggies"
-      #wonder_woman.url = "http://wonderwoman.com"
-      #wonder_woman.author_karma_points = 1140
-      #wonder_woman.tags = ["wonder_woman"]
-
-      #http://hn.algolia.com/api/v1/search?query=foo&tags=story
-
-      get :search_hackernews, params: { query: "wonder woman superman" }
+      VCR.use_cassette("hn_search") do
+        get :search_hackernews, params: { query: "wonder woman superman" }
+      end
 
       expect(response).to have_http_status(200)
       search_query = SearchQuery.last
       expect(search_query.query).to eq "wonder woman superman"
-      expect(search_query.total_hit_count).to eq 2
+      expect(search_query.total_hits_count).to eq 1
       search_results = search_query.search_results.to_a
-      # todo: test search_results content
       expect(assigns(:search_results)).to match_array search_results
+      search_result = search_results.first
+      expect(search_result.hn_login).to eq  "time_management"
+      expect(search_result.author_karma_points).to eq  nil
+      expect(search_result.url).to eq nil
+      expect(search_result.tags).to match_array ["story"]
     end
 
     it "pagination" do
-      pending
+      # each paginated query are considered separate now. It should be concidered to have different paginations use the same query
+      VCR.use_cassette("hn_search_paginated") do
+        get :search_hackernews, params: { query: "superheroes", page: 3 }
+      end
+
+      expect(response).to have_http_status(200)
+      search_query = SearchQuery.last
+      expect(search_query.query).to eq "superheroes"
+      expect(search_query.total_hits_count).to eq 144
+      expect(search_query.search_results.count).to eq 10
+      expect(search_query.search_results.map(&:hn_login).include?("janober")).to be true
     end
   end
 

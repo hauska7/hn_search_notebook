@@ -1,0 +1,113 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://hn.algolia.com/api/v1/search?hitsPerPage=10&page=0&query=wonder%20woman%20superman&tags=story
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Hn Search Notebook
+      From:
+      - hnsearchnotebook.herokuapp.com
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 06 Jan 2020 08:13:06 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Set-Cookie:
+      - __cfduid=d1a180e223baba1b87a4b736e6f9ebc731578298386; expires=Wed, 05-Feb-20
+        08:13:06 GMT; path=/; domain=.algolia.com; HttpOnly; SameSite=Lax; Secure
+      Etag:
+      - W/"a7f8b86ef23d1818427c82cfff2be19b"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - af385021-d71b-4d83-ae0b-eab7ba425af5
+      X-Runtime:
+      - '0.037629'
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - GET, PUT, DELETE, POST, OPTIONS
+      Access-Control-Allow-Headers:
+      - x-algolia-application-id, connection, origin, x-algolia-api-key, content-type,
+        content-length, x-algolia-signature, x-algolia-usertoken, x-algolia-tagfilters,
+        DNT, X-Mx-ReqToken, Keep-Alive, User-Agent, X-Requested-With, If-Modified-Since,
+        Cache-Control, Authorization, Accept
+      Access-Control-Allow-Credentials:
+      - 'false'
+      Cf-Cache-Status:
+      - DYNAMIC
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Expect-Ct:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 550c3b11dab1f2ac-WAW
+    body:
+      encoding: ASCII-8BIT
+      string: '{"hits":[{"created_at":"2008-12-31T15:25:47.000Z","title":"S\u0026P
+        ending ''08 around 900, thus... Summer of ''97 Thread","url":"","author":"time_management","points":2,"story_text":"With
+        the S\u0026#38;P set to close at mid-June 1997 levels, I thought it might
+        be appropriate to reminisce about the summer that was, the summer of ''97.\u003cp\u003eI
+        was between 8th and 9th grade, at CTY (Carlisle first session, Lancaster second).
+        CTY memories include: Don McLean''s \"American Pie\"... Scum: the Masquerade
+        (a card game)... Bleem, the integer between 3 and 4... trying to hook up with
+        a 15-point-7 year-old \"no more\" (no success; I was only 14.1). Great times.\u003cp\u003eI
+        was super-bummed about missing out on ARML, having not heard of the contest
+        till national Mathcounts in May, and therefore having learned about the contest
+        too late to register.\u003cp\u003eOutside of CTY sessions, I spent the summer
+        hacking QBasic text adventures that no one but me wanted to play. :(\u003cp\u003eI
+        won''t post too many songs of the era, because I figure other posters will
+        pick up the slack. Only three stick out as memorable:\u003cp\u003eSavage Garden
+        - To the Moon and Back. \nhttp://www.youtube.com/watch?v=9I9hVzqTbn0\u003cp\u003eThis
+        one I remember only because it was absolutely eerie at 4:00 on a summer morning.
+        (I had to listen to the radio at night, else I couldn''t fall asleep.)\u003cp\u003eOur
+        Lady Peace - Superman''s Dead\nhttp://www.youtube.com/watch?v=uOZLSHuDBxY\u003cp\u003eGreat
+        song from around that time from one of the most underrated ''90s bands.\u003cp\u003eWhite
+        Town - Your Woman\nhttp://www.youtube.com/watch?v=lVL-zZnD3VU\u003cp\u003eQuirky,
+        odd song from an unusually talented, but unpopularizable, one-hit wonder.
+        Vintage ''97.\u003cp\u003eWhat are your Summer of ''97 memories, songs, and
+        (of course) hacking projects?","comment_text":null,"num_comments":5,"story_id":null,"story_title":null,"story_url":null,"parent_id":null,"created_at_i":1230737147,"relevancy_score":1557,"_tags":["story","author_time_management","story_415542"],"objectID":"415542","_highlightResult":{"title":{"value":"S\u0026P
+        ending ''08 around 900, thus... Summer of ''97 Thread","matchLevel":"none","matchedWords":[]},"url":{"value":"","matchLevel":"none","matchedWords":[]},"author":{"value":"time_management","matchLevel":"none","matchedWords":[]},"story_text":{"value":"With
+        the S\u0026P set to close at mid-June 1997 levels, I thought it might be appropriate
+        to reminisce about the summer that was, the summer of ''97.\u003cp\u003eI
+        was between 8th and 9th grade, at CTY (Carlisle first session, Lancaster second).
+        CTY memories include: Don McLean''s \"American Pie\"... Scum: the Masquerade
+        (a card game)... Bleem, the integer between 3 and 4... trying to hook up with
+        a 15-point-7 year-old \"no more\" (no success; I was only 14.1). Great times.\u003cp\u003eI
+        was super-bummed about missing out on ARML, having not heard of the contest
+        till national Mathcounts in May, and therefore having learned about the contest
+        too late to register.\u003cp\u003eOutside of CTY sessions, I spent the summer
+        hacking QBasic text adventures that no one but me wanted to play. :(\u003cp\u003eI
+        won''t post too many songs of the era, because I figure other posters will
+        pick up the slack. Only three stick out as memorable:\u003cp\u003eSavage Garden
+        - To the Moon and Back. \nhttp://www.youtube.com/watch?v=9I9hVzqTbn0\u003cp\u003eThis
+        one I remember only because it was absolutely eerie at 4:00 on a summer morning.
+        (I had to listen to the radio at night, else I couldn''t fall asleep.)\u003cp\u003eOur
+        Lady Peace - \u003cem\u003eSuperman\u003c/em\u003e''s Dead\nhttp://www.youtube.com/watch?v=uOZLSHuDBxY\u003cp\u003eGreat
+        song from around that time from one of the most underrated ''90s bands.\u003cp\u003eWhite
+        Town - Your \u003cem\u003eWoman\u003c/em\u003e\nhttp://www.youtube.com/watch?v=lVL-zZnD3VU\u003cp\u003eQuirky,
+        odd song from an unusually talented, but unpopularizable, one-hit \u003cem\u003ewonder\u003c/em\u003e.
+        Vintage ''97.\u003cp\u003eWhat are your Summer of ''97 memories, songs, and
+        (of course) hacking projects?","matchLevel":"full","fullyHighlighted":false,"matchedWords":["wonder","woman","superman"]}}}],"nbHits":1,"page":0,"nbPages":1,"hitsPerPage":10,"exhaustiveNbHits":true,"query":"wonder
+        woman superman","params":"advancedSyntax=true\u0026analytics=true\u0026analyticsTags=backend\u0026hitsPerPage=10\u0026page=0\u0026query=wonder+woman+superman\u0026tags=story","processingTimeMS":5}'
+    http_version: 
+  recorded_at: Mon, 06 Jan 2020 08:13:07 GMT
+recorded_with: VCR 4.0.0
