@@ -84,8 +84,8 @@ class MainController < ApplicationController
     search_notebook = SearchNotebook.find(params["id"])
 
     ActiveRecord::Base.transaction do
-      ResultsInNotebook.where(search_notebook: object).delete_all
-      object.destroy!
+      ResultsInNotebook.where(search_notebook: search_notebook).delete_all
+      search_notebook.destroy!
     end
 
     flash[:notice] = "Search notebook deleted succesfully."
