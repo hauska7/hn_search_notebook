@@ -1,8 +1,4 @@
-$(document).ready(function() {
-  setup_add_search_result_to_search_notebook();
-});
-
-function setup_add_search_result_to_search_notebook () {
+function add_search_result_to_search_notebook_setup () {
   if ($('.add-search-result-to-search-notebook').length == 0) { return; }
 
   $('.add-search-result-to-search-notebook').each(function(_index, item) {

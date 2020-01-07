@@ -9,17 +9,6 @@ class Service
     ResultSuccess.new
   end
 
-  def self.delete(object)
-    if object.is_a?(SearchNotebook)
-      ActiveRecord::Base.transaction do
-        ResultsInNotebook.where(search_notebook: object).delete_all
-        object.destroy!
-      end
-    else fail
-    end
-    result_success
-  end
-
   def self.add_result_to_notebook(notebook, results)
     results = Array(results)
 

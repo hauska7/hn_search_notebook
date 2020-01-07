@@ -83,8 +83,10 @@ class MainController < ApplicationController
   def destroy_search_notebook
     search_notebook = SearchNotebook.find(params["id"])
 
-    result = Service.delete(search_notebook)
-    fail unless result.success?
+    ActiveRecord::Base.transaction do
+      ResultsInNotebook.where(search_notebook: object).delete_all
+      object.destroy!
+    end
 
     flash[:notice] = "Search notebook deleted succesfully."
     redirect_to index_search_notebooks_path

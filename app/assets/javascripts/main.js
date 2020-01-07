@@ -23,3 +23,7 @@ function main_notify_success (message) {
 function main_notify_failure (message) {
   alert(message);
 }
+
+$(document).ready(function() {
+  add_search_result_to_search_notebook_setup();
+});
