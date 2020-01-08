@@ -92,7 +92,8 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  config.middleware.insert_after(::Rack::Runtime, ::Rack::Auth::Basic, "Production") do |_username, password|
-    password == ENV.fetch("STAGING_PASSWORD")
-  end
+  # password protect access to application
+  #config.middleware.insert_after(::Rack::Runtime, ::Rack::Auth::Basic, "Production") do |_username, password|
+  #  password == ENV.fetch("STAGING_PASSWORD")
+  #end
 end
